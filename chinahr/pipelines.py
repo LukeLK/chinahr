@@ -7,6 +7,7 @@
 
 
 import json
+import re
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -71,7 +72,7 @@ class JsonWriterPipeline(object):
         self.file_com = open('comItem0.jl', 'wb')
         self.file_jobNum = 1
         self.file_comNum = 1
-        self.maxNum = 100
+        self.maxNum = 1000
 
     def open_spider(self, spider):
         self.file_job.write('JobList####################################Beginning!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
@@ -98,4 +99,7 @@ class JsonWriterPipeline(object):
         else:
             return item
         return item
+
+
+
 

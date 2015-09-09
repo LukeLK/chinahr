@@ -1,5 +1,6 @@
 __author__ = 'bitfeng'
 
+import re
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
 from chinahr.items import JobInfoItem, ComInfoItem
@@ -45,13 +46,13 @@ class ZhaopinCrawlSpider(CrawlSpider):
         job_item['job_miniEdu'] = response.xpath('//ul[@class="terminal-ul clearfix"]/li[6]/strong/text()').extract()
         job_item['job_recruNums'] = response.xpath('//ul[@class="terminal-ul clearfix"]/li[7]/strong/text()').extract()
         job_item['job_category'] = response.xpath('//ul[@class="terminal-ul clearfix"]/li[8]/strong/a/text()').extract()
-        job_item['job_desc_detail'] = response.xpath('//div[@class="tab-inner-cont"][1]/*/text()').extract()
+        job_item['job_desc_detail'] = self.extract_text(response.xpath('//div[@class="tab-inner-cont"][1]').extract())
         job_item['job_desc_loc'] = response.xpath('//div[@class="tab-inner-cont"][1]/h2/text()').extract()
 
         com_item['url'] = response.xpath('//div[@class="company-box"]/p[@class="company-name-t"]/a/@href').extract()
         com_item['com_name'] = response.xpath('//div[@class="company-box"]/p[@class="company-name-t"]/a/text()').extract()
-        com_item['com_detail'] = response.xpath('//div[@class="company-box"]/p[@class="company-name-t"]/ul/*/text()').extract()
-        com_item['com_intro'] = response.xpath('//div[@class="tab-inner-cont"][2]/*/text()').extract()
+        com_item['com_detail'] = self.extract_text(response.xpath('//div[@class="company-box"]/ul/li').extract())
+        com_item['com_intro'] = self.extract_text(response.xpath('//div[@class="tab-inner-cont"][2]').extract())
 
         return job_item, com_item
 
@@ -64,3 +65,10 @@ class ZhaopinCrawlSpider(CrawlSpider):
 #            else:
 #                pass
 #        return dom+'?'+'&'.join(para)+'&p=1'+'&isadv=0'
+
+    def extract_text(self, str_sel):
+        str_re = []
+        pattern = re.compile(u'(?<=>)[\s\S]*?(?=<)')
+        for var in str_sel:
+            str_re.append(re.sub(u'\r?\n', '/', ''.join(pattern.findall(var))).replace(' ', ''))
+        return str_re
