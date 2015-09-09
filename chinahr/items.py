@@ -17,12 +17,19 @@ class JobInfoItem(scrapy.Item):
     job_company = scrapy.Field()
     job_update = scrapy.Field()
     job_salary = scrapy.Field()
+    job_location = scrapy.Field()
+    job_experience = scrapy.Field()
+    job_recruNums = scrapy.Field()
+    job_nature = scrapy.Field()
+    job_miniEdu = scrapy.Field()
     job_detail = scrapy.Field()
     job_benefits = scrapy.Field()
 
     job_desc_loc = scrapy.Field()
     job_desc_type = scrapy.Field()
     job_desc_detail = scrapy.Field()
+    job_desc_resp = scrapy.Field()
+    job_desc_req =scrapy.Field()
     job_condition = scrapy.Field()
 
 
@@ -34,3 +41,4 @@ class ComInfoItem(scrapy.Item):
     com_intro = scrapy.Field()
     com_level = scrapy.Field()
     com_bene_other = scrapy.Field()
+

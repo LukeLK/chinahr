@@ -83,13 +83,13 @@ class JsonWriterPipeline(object):
 
     def process_item(self, item, spider):
         line = json.dumps(dict(item)) + "\n"
-        if '/job/' in item['url']:
+        if 'job' in item['url']:
             if self.file_jobNum % self.maxNum == 0:
                 self.file_job.close()
                 self.file_job = open('jobItem'+str(self.file_jobNum / self.maxNum)+'.jl', 'wb')
             self.file_job.write(line)
             self.file_jobNum += 1
-        elif '/company/' in item['url']:
+        elif 'company' in item['url']:
             if self.file_comNum % self.maxNum == 0:
                 self.file_com.close()
                 self.file_com = open('comItem'+str(self.file_comNum / self.maxNum)+'.jl', 'wb')

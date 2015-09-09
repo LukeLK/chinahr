@@ -95,7 +95,7 @@ location.append('37')
 
 print len(industry)*len(profession)
 
-start_url = open('/Users/bitfeng/spiders/chinahr/start_urls.txt', 'wb')
+start_url = open('/Users/bitfeng/spiders/chinahr/chinahr_start_urls.txt', 'wb')
 print type(industry)
 start_url.write(','.join(industry)+'\n')
 start_url.write(','.join(profession)+'\n')
@@ -110,7 +110,7 @@ head = 'http://www.chinahr.com/so/0/0-0-0-0-0-0-0'
 body = '0-0-0-0-0'
 tail = '0/p0'
 
-urlsFile = open('/Users/bitfeng/spiders/chinahr/start.txt', 'wb')
+urlsFile = open('/Users/bitfeng/spiders/chinahr/chinahr_start.txt', 'wb')
 
 urls = []
 
@@ -122,6 +122,7 @@ urls.sort()
 
 for line in urls:
     urlsFile.write(line+'\n')
+urlsFile.close()
 
 print urls[0:5]
 print len(urls)
