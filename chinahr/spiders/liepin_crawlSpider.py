@@ -30,6 +30,7 @@ class LiepinCrawlSpider(CrawlSpider):
         job_item = JobInfoItem()
         com_item = ComInfoItem()
         job_item['url'] = response.url
+
         over = response.xpath('//div[@class="title-info over"]')
         if over:
             job_item['job_name'] = response.xpath('//div[@class="title-info over"]/h1/text()').extract()
@@ -38,6 +39,7 @@ class LiepinCrawlSpider(CrawlSpider):
         else:
             job_item['job_name'] = response.xpath('//div[@class="title-info "]/h1/text()').extract()
             job_item['job_company'] = response.xpath('//div[@class="title-info "]/h3/text()').extract()
+        job_item['job_detail'] = response.xpath('//div[@class="resume clearfix"]/span/text()').extract()
         job_item['job_salary'] = response.xpath('//p[@class="job-main-title"]/text()').extract()
         job_item['job_location'] = response.xpath('//p[@class="basic-infor"]/span[1]/text()').extract()
         job_item['job_update'] = response.xpath('//p[@class="basic-infor"]/span[2]/text()').extract()
