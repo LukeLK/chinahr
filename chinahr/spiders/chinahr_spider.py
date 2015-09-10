@@ -1,5 +1,6 @@
 __author__ = 'bitfeng'
 
+import os
 import scrapy
 from chinahr.items import JobInfoItem, ComInfoItem
 
@@ -9,7 +10,9 @@ class ChinahrSpider(scrapy.Spider):
     name = 'chinahr'
     allowed_domains = ['chinahr.com']
     urls = []
-    for url in open('/Users/bitfeng/spiders/chinahr/chinahr_start.txt', 'r'):
+    BASE_DIR = os.path.dirname(__file__)
+    file_path = os.path.join(BASE_DIR, 'chinahr_start.txt')
+    for url in open(file_path, 'r'):
         urls.append(url.strip())
     start_urls = urls
 

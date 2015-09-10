@@ -32,6 +32,7 @@ class JobInfoItem(scrapy.Item):
     job_desc_req =scrapy.Field()
     job_condition = scrapy.Field()
 
+    job_remark = scrapy.Field()
 
 class ComInfoItem(scrapy.Item):
     url = scrapy.Field()
@@ -41,4 +42,8 @@ class ComInfoItem(scrapy.Item):
     com_intro = scrapy.Field()
     com_level = scrapy.Field()
     com_bene_other = scrapy.Field()
+    com_nature = scrapy.Field()
+    com_size = scrapy.Field()
+    com_industry = scrapy.Field()
+    com_address = scrapy.Field()
 

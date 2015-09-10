@@ -100,6 +100,10 @@ class JsonWriterPipeline(object):
             return item
         return item
 
-
-
+    def strip_blankchr(self, str_sel):
+        str_re = []
+        for var in str_sel:
+            if re.compile(u'^\s+$').match(var):
+                str_re.append(var.strip())
+        return str_re
 

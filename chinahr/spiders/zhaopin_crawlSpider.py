@@ -1,6 +1,7 @@
 __author__ = 'bitfeng'
 
 import re
+import os
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
 from chinahr.items import JobInfoItem, ComInfoItem
@@ -9,11 +10,12 @@ from chinahr.items import JobInfoItem, ComInfoItem
 class ZhaopinCrawlSpider(CrawlSpider):
     name = 'zhaopin'
     allowed_domain = ['zhaopin.com']
-
     urls = []
-    for url in open('/Users/bitfeng/spiders/chinahr/zhaopin_start.txt', 'r'):
+    BASE_DIR = os.path.dirname(__file__)
+    file_path = os.path.join(BASE_DIR, 'zhaopin_start.txt')
+    for url in open(file_path, 'r'):
         urls.append(url.strip())
-    start_urls = urls[0:1]
+    start_urls = urls
 
 #    cities = []
 #    for line in open('/Users/bitfeng/spiders/chinahr/city3.txt'):
