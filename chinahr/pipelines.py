@@ -104,6 +104,6 @@ class TxtWriterPipeline(object):
             self.file_com.write(line)
             self.file_comNum += 1
         else:
-            return item
+            pass
         return item
 
