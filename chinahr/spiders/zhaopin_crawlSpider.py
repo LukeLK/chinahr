@@ -10,27 +10,18 @@ from chinahr.items import JobInfoItem, ComInfoItem
 class ZhaopinCrawlSpider(CrawlSpider):
     name = 'zhaopin'
     allowed_domain = ['zhaopin.com']
+
     urls = []
     BASE_DIR = os.path.dirname(__file__)
     file_path = os.path.join(BASE_DIR, 'zhaopin_start.txt')
     for url in open(file_path, 'r'):
         urls.append(url.strip())
+
     start_urls = urls
-
-#    cities = []
-#    for line in open('/Users/bitfeng/spiders/chinahr/city3.txt'):
-#        cities.append(urllib.quote(line.strip()))
-
     rules = [
         Rule(LxmlLinkExtractor(restrict_xpaths=('//div[@class="pagesDown"]')), follow=True),
         Rule(LxmlLinkExtractor(allow=('http://jobs.zhaopin.com/',)), callback='parse_info', follow=False),
     ]
-
-#    def parse_start_url(self, response):
-#        urls = response.xpath('//div[@id="search_bottom_content_demo"]/div[@class="clearfixed"]/h1/a/@href').extract()
-#        for url in urls:
-#            for city in self.cities[1:]:
-#                scrapy.Request('http://sou.zhaopin.com'+self.format_url_city(url, city))
 
     def parse_info(self, response):
         job_item = JobInfoItem()
@@ -57,16 +48,6 @@ class ZhaopinCrawlSpider(CrawlSpider):
         com_item['com_intro'] = self.extract_text(response.xpath('//div[@class="tab-inner-cont"][2]').extract())
 
         return job_item, com_item
-
-#    def format_url_city(self, url, city):
-#        dom = url.split('?')[0]
-#        para = url.split('?')[1].split('&')
-#        for i in range(len(para)):
-#            if 'jl=' in para[i]:
-#                para[i] = 'jl='+city
-#            else:
-#                pass
-#        return dom+'?'+'&'.join(para)+'&p=1'+'&isadv=0'
 
     def extract_text(self, str_sel):
         str_re = []

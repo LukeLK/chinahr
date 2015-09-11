@@ -6,6 +6,7 @@ from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
 from chinahr.items import JobInfoItem, ComInfoItem
 
+
 class LiepinCrawlSpider(CrawlSpider):
     name = 'liepin'
     allowed_domain = ['liepin.com']
