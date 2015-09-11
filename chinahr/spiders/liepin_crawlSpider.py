@@ -47,8 +47,8 @@ class LiepinCrawlSpider(CrawlSpider):
         job_item['job_desc_resp'] = response.xpath('//div[@class="content content-word"][1]/text()').extract()
 
         if 'a.liepin.com/' in response.url:
-            job_item['job_benefits'] = self.extract_text(response.xpath('//div[@class="content content-word"][3]/ul/li').extract())
-            job_item['job_desc_detail'] = self.extract_text(response.xpath('//div[@class="content content-word"][2]/ul/li').extract())
+            job_item['job_benefits'] = self.extract_text(response.xpath('//div[@class="content content-word"]/ul/li').extract()[8:])
+            job_item['job_desc_detail'] = self.extract_text(response.xpath('//div[@class="content content-word"]/ul/li').extract()[:8])
             job_item['job_company'].insert(0, 'hunter:')
             return job_item
         else:
@@ -57,6 +57,7 @@ class LiepinCrawlSpider(CrawlSpider):
             com_item['url'] = response.xpath('//div[@class="right-post-top"]/a/@href').extract()
             com_item['com_industry'] = response.xpath('//div[@class="right-post-top"]/div[@class="content content-word"]/a[1]/@title').extract()
             com_detail = self.strip_blankchr(response.xpath('//div[@class="right-post-top"]/div[@class="content content-word"]/text()').extract())
+            com_detail.extend(['', '', ''])
             com_item['com_size'] = com_detail[0]
             com_item['com_nature'] = com_detail[1]
             com_item['com_address'] = com_detail[2]
