@@ -10,8 +10,8 @@ class ChinahrSpider(scrapy.Spider):
     name = 'chinahr'
     allowed_domains = ['chinahr.com']
     urls = []
-    BASE_DIR = os.path.dirname(__file__)
-    file_path = os.path.join(BASE_DIR, 'chinahr_start.txt')
+    BASE_DIR = os.path.abspath('.')
+    file_path = os.path.join(BASE_DIR, 'chinahr/spiders/chinahr_start.txt')
     for url in open(file_path, 'r'):
         urls.append(url.strip())
     start_urls = urls
