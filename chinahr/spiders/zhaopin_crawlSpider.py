@@ -1,12 +1,16 @@
+# -*- coding: utf-8 -*-
+
+#智联招聘的spider，爬取job和com信息
 __author__ = 'bitfeng'
 
-import re
 import os
-from scrapy.spiders import CrawlSpider, Rule
+from scrapy.spiders import CrawlSpider, Rule  #使用CrawlSpider类
 from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
 from chinahr.items import JobInfoItem, ComInfoItem
+from chinahr.formatText import FormatText
 
 
+#参见liepin_crawlSpider
 class ZhaopinCrawlSpider(CrawlSpider):
     name = 'zhaopin'
     allowed_domain = ['zhaopin.com']
@@ -18,6 +22,8 @@ class ZhaopinCrawlSpider(CrawlSpider):
         urls.append(url.strip())
 
     start_urls = urls
+    ext = FormatText()
+
     rules = [
         Rule(LxmlLinkExtractor(restrict_xpaths=('//div[@class="pagesDown"]')), follow=True),
         Rule(LxmlLinkExtractor(allow=('http://jobs.zhaopin.com/',)), callback='parse_info', follow=False),
@@ -30,7 +36,6 @@ class ZhaopinCrawlSpider(CrawlSpider):
         job_item['job_name'] = response.xpath('//div[@class="inner-left fl"][1]/h1/text()').extract()
         job_item['job_company'] = response.xpath('//div[@class="inner-left fl"][1]/h2/a/text()').extract()
         job_item['job_benefits'] = response.xpath('//div[@class="inner-left fl"][1]/div/span/text()').extract()
-
         job_item['job_salary'] = response.xpath('//ul[@class="terminal-ul clearfix"]/li[1]/strong/text()').extract()
         job_item['job_location'] = response.xpath('//ul[@class="terminal-ul clearfix"]/li[2]/strong/a/text()').extract()
         job_item['job_update'] = response.xpath('//ul[@class="terminal-ul clearfix"]/li[3]/strong/span/text()').extract()
@@ -39,19 +44,12 @@ class ZhaopinCrawlSpider(CrawlSpider):
         job_item['job_miniEdu'] = response.xpath('//ul[@class="terminal-ul clearfix"]/li[6]/strong/text()').extract()
         job_item['job_recruNums'] = response.xpath('//ul[@class="terminal-ul clearfix"]/li[7]/strong/text()').extract()
         job_item['job_category'] = response.xpath('//ul[@class="terminal-ul clearfix"]/li[8]/strong/a/text()').extract()
-        job_item['job_desc_detail'] = self.extract_text(response.xpath('//div[@class="tab-inner-cont"][1]').extract())
+        job_item['job_desc_detail'] = self.ext.extract_text(response.xpath('//div[@class="tab-inner-cont"][1]').extract())
         job_item['job_desc_loc'] = response.xpath('//div[@class="tab-inner-cont"][1]/h2/text()').extract()
-
         com_item['url'] = response.xpath('//div[@class="company-box"]/p[@class="company-name-t"]/a/@href').extract()
         com_item['com_name'] = response.xpath('//div[@class="company-box"]/p[@class="company-name-t"]/a/text()').extract()
-        com_item['com_detail'] = self.extract_text(response.xpath('//div[@class="company-box"]/ul/li').extract())
-        com_item['com_intro'] = self.extract_text(response.xpath('//div[@class="tab-inner-cont"][2]').extract())
+        com_item['com_detail'] = self.ext.extract_text(response.xpath('//div[@class="company-box"]/ul/li').extract())
+        com_item['com_intro'] = self.ext.extract_text(response.xpath('//div[@class="tab-inner-cont"][2]').extract())
 
         return job_item, com_item
 
-    def extract_text(self, str_sel):
-        str_re = []
-        pattern = re.compile(u'(?<=>)[\s\S]*?(?=<)')
-        for var in str_sel:
-            str_re.append(re.sub(u'\r?\n', '/', ''.join(pattern.findall(var))).replace(' ', ''))
-        return str_re

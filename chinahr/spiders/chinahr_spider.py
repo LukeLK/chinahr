@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+
+#中华英才网的spider，爬取job和com信息
+
 __author__ = 'bitfeng'
 
 import os
@@ -5,6 +9,7 @@ import scrapy
 from chinahr.items import JobInfoItem, ComInfoItem
 
 
+#参见liepin_crawlSpider
 class ChinahrSpider(scrapy.Spider):
 
     name = 'chinahr'
@@ -15,6 +20,31 @@ class ChinahrSpider(scrapy.Spider):
     for url in open(file_path, 'r'):
         urls.append(url.strip())
     start_urls = urls
+
+    #Spider默认处理start_urls的函数，进行复写
+    def parse(self, response):
+        maxPageNumStr = ''.join(response.xpath('//a[@class="paging_jz"][last()]/span/text()').extract())
+        onePage = ''.join(response.xpath('//a[@class="paging_jzd"]/span/text()').extract()).strip()
+        if maxPageNumStr.isdigit():
+            url_sec = response.url.split('/')
+            url_head = '/'.join(url_sec[0:-1])
+            urls_tail = [str(i*20) for i in range(int(maxPageNumStr))]
+            urls = [url_head+'/p'+tail for tail in urls_tail]
+            for url in urls:
+                yield scrapy.Request(url, callback=self.parse_urls)
+        elif int(onePage) == 1:
+            yield scrapy.Request(response.url, callback=self.parse_urls)
+        else:
+            pass
+
+    def parse_urls(self, response):
+        job_urls = response.xpath('//a[@class="js_detail"]/@href').extract()
+        com_urls = response.xpath('//a[@class="js_com_name"]/@href').extract()
+        category = ''.join(response.xpath('//div[@class="crumb_jobs"]/span[last()]/text()').extract()).strip()
+        for url in job_urls:
+            yield scrapy.Request(url, callback=self.parse_jobinfo, meta={'category': category})
+        for url in com_urls:
+            yield scrapy.Request(url, callback=self.parse_cominfo, meta={'category': category})
 
     def parse_jobinfo(self, response):
         jobItem = JobInfoItem()
@@ -50,29 +80,7 @@ class ChinahrSpider(scrapy.Spider):
         comItem['com_detail'] = [k+v for k, v in zip(detailText1, detailText2)]
         return comItem
 
-    def parse(self, response):
-        maxPageNumStr = ''.join(response.xpath('//a[@class="paging_jz"][last()]/span/text()').extract())
-        onePage = ''.join(response.xpath('//a[@class="paging_jzd"]/span/text()').extract()).strip()
-        if maxPageNumStr.isdigit():
-            url_sec = response.url.split('/')
-            url_head = '/'.join(url_sec[0:-1])
-            urls_tail = [str(i*20) for i in range(int(maxPageNumStr))]
-            urls = [url_head+'/p'+tail for tail in urls_tail]
-            for url in urls:
-                yield scrapy.Request(url, callback=self.parse_urls)
-        elif int(onePage) == 1:
-            yield scrapy.Request(response.url, callback=self.parse_urls)
-        else:
-            pass
 
-    def parse_urls(self, response):
-        job_urls = response.xpath('//a[@class="js_detail"]/@href').extract()
-        com_urls = response.xpath('//a[@class="js_com_name"]/@href').extract()
-        category = ''.join(response.xpath('//div[@class="crumb_jobs"]/span[last()]/text()').extract()).strip()
-        for url in job_urls:
-            yield scrapy.Request(url, callback=self.parse_jobinfo, meta={'category': category})
-        for url in com_urls:
-            yield scrapy.Request(url, callback=self.parse_cominfo, meta={'category': category})
 
 
 
