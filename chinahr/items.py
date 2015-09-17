@@ -34,6 +34,10 @@ class JobInfoItem(scrapy.Item):
 
     job_remark = scrapy.Field()
 
+    def name(self):
+        return 'JobInfoItem'
+
+
 class ComInfoItem(scrapy.Item):
     url = scrapy.Field()
     com_name = scrapy.Field()
@@ -46,4 +50,7 @@ class ComInfoItem(scrapy.Item):
     com_size = scrapy.Field()
     com_industry = scrapy.Field()
     com_address = scrapy.Field()
+    com_zipCode = scrapy.Field()
 
+    def name(self):
+        return 'ComInfoItem'
