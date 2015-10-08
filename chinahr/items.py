@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+__author__ = 'bitfeng'
 # Define here the models for your scraped items
 #
 # See documentation in:

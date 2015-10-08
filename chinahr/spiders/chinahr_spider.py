@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-#中华英才网的spider，爬取job和com信息
+#中华英才网的spider，爬取job和company信息
 
 __author__ = 'bitfeng'
 

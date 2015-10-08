@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-#猎聘的spider，爬取job和com信息
+#猎聘的spider，爬取job和company信息
 
 __author__ = 'bitfeng'
 
@@ -36,7 +36,7 @@ class LiepinCrawlSpider(CrawlSpider):
         for url in urls:
             yield scrapy.Request('http://www.liepin.com'+re.sub(re.compile(u'&dqs=\d*'), '', url))
 
-    #抓取职位信息
+    #抓取 职位信息 和 公司信息
     def parse_info(self, response):
         job_item = JobInfoItem()
         com_item = ComInfoItem()

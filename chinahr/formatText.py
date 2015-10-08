@@ -24,3 +24,4 @@ class FormatText(object):
             else:
                 pass
         return str_re
+

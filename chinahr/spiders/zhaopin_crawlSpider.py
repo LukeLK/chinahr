@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-#智联招聘的spider，爬取job和com信息
+#智联招聘的spider，爬取job和company信息
 __author__ = 'bitfeng'
 
 import os
