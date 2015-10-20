@@ -63,9 +63,10 @@ NEWSPIDER_MODULE = 'chinahr.spiders'
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'chinahr.pipelines.JsonWriterPipeline': 400,
+#    'chinahr.pipelines.JsonWriterPipeline': 400,
 #    'chinahr.pipelines.TxtWriterPipeline': 400,
-    'chinahr.pipelines.FormatItemPipeline': 300,
+    'chinahr.pipelines.FormatItemPipeline': 100,
+    'chinahr.pipelines.MySQLPipeline': 200,
     }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -87,6 +88,16 @@ ITEM_PIPELINES = {
 #HTTPCACHE_IGNORE_HTTP_CODES=[]
 #HTTPCACHE_STORAGE='scrapy.extensions.httpcache.FilesystemCacheStorage'
 
-LOG_LEVEL = 'INFO'
+#LOG_LEVEL = 'INFO'
 LOG_FILE = 'log.txt'
+
+MYSQL_URI = {
+    'host': '127.0.0.1',
+    'port': 3306,
+    'db': 'chinahr',
+    'user': 'root',
+    'passwd': 'wybigdata',
+    'charset': 'utf8',
+    }
+
 
