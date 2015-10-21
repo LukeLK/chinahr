@@ -7,8 +7,8 @@ __author__ = 'bitfeng'
 import os
 import scrapy
 from chinahr.items import JobInfoItem, ComInfoItem
-from chinahr.formatText import FormatText
 from scrapy.loader import ItemLoader
+from chinahr.processors import *
 
 # 参见liepin_crawlSpider
 class ChinahrSpider(scrapy.Spider):
@@ -20,8 +20,7 @@ class ChinahrSpider(scrapy.Spider):
     file_path = os.path.join(BASE_DIR, 'chinahr/spiders/chinahr_start.txt')
     for url in open(file_path, 'r'):
         urls.append(url.strip())
-    start_urls = urls[0:1]
-    ext = FormatText()
+    start_urls = urls
 
     # Spider默认处理start_urls的函数，进行复写
     def parse(self, response):
@@ -50,44 +49,38 @@ class ChinahrSpider(scrapy.Spider):
 
     def parse_jobinfo(self, response):
 
-        jobItem = JobInfoItem()
-        jobItem['job_category'] = response.meta['category']
-        jobItem['url'] = response.url
-        jobItem['job_name'] = response.xpath('//h1[@class="company_name"]/text()').extract()
-        jobItem['job_company'] = response.xpath('//span[@class="subC_name"]/a/text()').extract()
-        jobItem['job_update'] = response.xpath('//span[@class="detail_C_Date fl"]/text()').re(u'\d{1,4}-\d{1,2}-\d{1,2}')
-        jobItem['job_salary'] = response.xpath('//div[@class="detail_C_info"]/span/strong/text()').extract()
-        # jobItem['job_detail'] = response.xpath('//div[@class="detail_C_info"]/span/text()').extract()
-        jobItem['job_recruNums'] = response.xpath('//div[@class="detail_C_info"]/span/text()').re(u'(?<=招聘人数：).*')
-        jobItem['job_miniEdu'] = response.xpath('//div[@class="detail_C_info"]/span/text()').extract()[1]
-        jobItem['job_experience'] = response.xpath('//div[@class="detail_C_info"]/span/text()').extract()[2]
-        jobItem['job_reqSex'] = self.ext.strip_list(
-            response.xpath('//p[@class="sub_infoMa"]/span/text()').re(u'(?<=性别要求[:，：])[\s\S]*'))
-        jobItem['job_reqAge'] = response.xpath('//p[@class="sub_infoMa"]/span/text()').re(u'(?<=年龄[:，：])[\s\S]*')
-        jobItem['job_benefits'] = response.xpath('//ul[@class="welf_list clear toggleWelfL"]/li/text()').extract()
-        jobItem['job_location'] = response.xpath('//div[@class="job_desc"]/p[1]/a/text()').extract()
-        jobItem['job_nature'] = response.xpath('//div[@class="job_desc"]/p[2]/text()').re(u'(?<=工作性质：)[\s\S]*')
-        # jobItem['job_desc_detail'] = response.xpath('//p[@class="sub_infoMa"]/span/text()').extract()
-        jobItem['job_desc_resp'] = self.ext.extract_text(
-            response.xpath('//p[@class="detial_jobSec"]').re(u'(?<=岗位职责[:，：])[\s\S]*'))
-        jobItem['job_desc_req'] = self.ext.extract_text(
-            response.xpath('//p[@class="detial_jobSec"]').re(u'(?<=任职条件[:，：])[\s\S]*'))
-        jobItem['job_desc_detail'] = self.ext.extract_text(
-            response.xpath('//p[@class="detial_jobSec"]').re(u'(?<=其他福利[:，：])[\s\S]*'))
-        return jobItem
+        loader = ItemLoader(item=JobInfoItem(), response=response)
+        loader.add_value('job_category', value=response.meta['category'])
+        loader.add_value('url', value=response.url)        
+        loader.add_xpath('job_name', '//h1[@class="company_name"]/text()', TakeFirstL())        
+        loader.add_xpath('job_company', '//span[@class="subC_name"]/a/text()', TakeFirstL())        
+        loader.add_xpath('job_update', '//span[@class="detail_C_Date fl"]', re=u'\d{1,4}-\d{1,2}-\d{1,2}')        
+        loader.add_xpath('job_salary', '//div[@class="detail_C_info"]/span/strong/text()', TakeFirstL())        
+        loader.add_xpath('job_recruNums', '//div[@class="detail_C_info"]/span/text()', re=u'(?<=招聘人数：).*')        
+        loader.add_xpath('job_miniEdu', '//div[@class="detail_C_info"]/span/text()', TakeNumL(1))        
+        loader.add_xpath('job_experience', '//div[@class="detail_C_info"]/span/text()', TakeNumL(2))
+        loader.add_xpath('job_reqSex', '//p[@class="sub_infoMa"]/span/text()', TakeFirstL(), re=u'(?<=性别要求[:，：])[\s\S]*')
+        loader.add_xpath('job_reqAge', '//p[@class="sub_infoMa"]/span/text()', TakeFirstL(), re=u'(?<=年龄[:，：])[\s\S]*')        
+        loader.add_xpath('job_benefits', '//ul[@class="welf_list clear toggleWelfL"]/li/text()', JoinL('|'))        
+        loader.add_xpath('job_location', '//div[@class="job_desc"]/p/a/text()', TakeFirstL())
+        loader.add_xpath('job_nature', '//div[@class="job_desc"]/p/text()', TakeFirstL(), re=u'(?<=工作性质：)[\s\S]*')
+        loader.add_xpath('job_desc_resp', '//p[@class="detial_jobSec"]', RemoveTagsL(), TakeFirstL(), re=u'(?<=岗位职责[:，：])[\s\S]*')        
+        loader.add_xpath('job_desc_req', '//p[@class="detial_jobSec"]', RemoveTagsL(), TakeFirstL(), re=u'(?<=任职条件[:，：])[\s\S]*')        
+        loader.add_xpath('job_desc_detail', '//p[@class="detial_jobSec"]', RemoveTagsL(), TakeFirstL(), re=u'(?<=其他福利[:，：])[\s\S]*')
+
+        return loader.load_item()
 
     def parse_cominfo(self, response):
-        comItem = ComInfoItem()
-        comItem['url'] = response.url
-        comItem['com_name'] = response.xpath('//span[@class="compTitle"]/text()').extract()
-        comItem['com_benefits'] = response.xpath('//li[@class="benefits"]/ul/li/text()').extract()
-        comItem['com_intro'] = self.ext.extract_text(
-            response.xpath('//div[@class="comp_content clearfix"]/div[@class="about"]/div[@class="content"]').extract())
-        comItem['com_bene_other'] = self.ext.extract_text(
-            response.xpath('//div[@class="comp_content clearfix"]/div[@class="benefit"]/div[@class="content"]/text()').extract())
-        comItem['com_level'] = response.xpath('//div[@class="fl on"]/span/text()').extract()
-        comItem['com_industry'] = response.xpath('//ul[@class="detail_R_cList"]/li').re(u'(?<=行业：</span>)[\s\S]*(?=</li>)')
-        comItem['com_nature'] = response.xpath('//ul[@class="detail_R_cList"]/li').re(u'(?<=性质：</span>)[\s\S]*(?=</li>)')
-        comItem['com_size'] = response.xpath('//ul[@class="detail_R_cList"]/li').re(u'(?<=规模：</span>)[\s\S]*(?=</li>)')
-        comItem['com_link'] = response.xpath('//ul[@class="detail_R_cList"]/li/a/@href').extract()
-        return comItem
+        loader = ItemLoader(item=ComInfoItem(), response=response)
+        loader.add_value('url', value=response.url)
+        loader.add_xpath('com_name', '//span[@class="compTitle"]/text()', TakeFirstL())
+        loader.add_xpath('com_benefits', '//li[@class="benefits"]/ul/li/text()', JoinL('|'))
+        loader.add_xpath('com_intro', '//div[@class="comp_content clearfix"]/div[@class="about"]/div[@class="content"]', ExtractTextL(), TakeFirstL())
+        loader.add_xpath('com_bene_other', '//div[@class="comp_content clearfix"]/div[@class="benefit"]/div[@class="content"]/text()', ExtractTextL(), TakeFirstL())
+        loader.add_xpath('com_level', '//div[@class="fl on"]/span/text()', TakeFirstL())
+        loader.add_xpath('com_industry', '//ul[@class="detail_R_cList"]/li', TakeFirstL(), re=u'(?<=行业：</span>)[\s\S]*(?=</li>)')
+        loader.add_xpath('com_nature', '//ul[@class="detail_R_cList"]/li', TakeFirstL(), re=u'(?<=性质：</span>)[\s\S]*(?=</li>)')
+        loader.add_xpath('com_size', '//ul[@class="detail_R_cList"]/li', TakeFirstL(), re=u'(?<=规模：</span>)[\s\S]*(?=</li>)')
+        loader.add_xpath('com_link', '//ul[@class="detail_R_cList"]/li/a/@href', TakeFirstL())
+
+        return loader.load_item()

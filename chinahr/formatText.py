@@ -42,3 +42,6 @@ class FormatText(object):
         for var in str_sel:
             str_re.append(var.strip())
         return str_re
+
+
+

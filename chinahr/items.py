@@ -28,13 +28,12 @@ class JobInfoItem(scrapy.Item):
     job_benefits = scrapy.Field()  # 工作福利
     job_reqSex = scrapy.Field()  # 性别要求
     job_reqAge = scrapy.Field()  # 年龄要求
+    job_reqLan = scrapy.Field()  # 语言要求
 
     job_desc_loc = scrapy.Field()  # 工作详细地址
-    job_desc_type = scrapy.Field()  # 描述信息中的工作类型
-    job_desc_detail = scrapy.Field()  # 描述中的细节
+    job_desc = scrapy.Field()  # 描述
     job_desc_resp = scrapy.Field()  # 工作职责
     job_desc_req = scrapy.Field()  # 工作要求
-    job_condition = scrapy.Field()  # 工作内容
 
     # Item类型
     def classname(self):

@@ -14,6 +14,7 @@ import MySQLdb
 import MySQLdb.cursors
 from scrapy import log
 
+
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -23,10 +24,14 @@ class FormatItemPipeline(object):
     def process_item(self, item, spider):
         for key in item.keys():
             if type(item[key]) == list:  # 将list转换为string
+                if '' in item[key]:
+                    item[key].remove('')
+                else:
+                    pass
                 if len(item[key]) == 0:
                     item[key] = 'null'
                 elif len(item[key]) == 1:
-                    item[key] = item[key][1].strip()
+                    item[key] = item[key][0]
                 else:
                     item[key] = '|'.join(item[key])
         return item
@@ -136,14 +141,13 @@ class MySQLPipeline(object):
                    "job_detail," \
                    "job_benefits," \
                    "job_desc_loc," \
-                   "job_desc_type," \
-                   "job_desc_detail," \
+                   "job_desc," \
                    "job_desc_resp," \
                    "job_desc_req," \
                    "job_reqSex," \
                    "job_reqAge," \
-                   "job_condition) " \
-                   "values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                   "job_reqLan) " \
+                   "values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
 
             tx.execute(sqli, (datetime.datetime.now(),
                               itemdict.setdefault('job_category', None),
@@ -160,13 +164,12 @@ class MySQLPipeline(object):
                               itemdict.setdefault('job_detail', None),
                               itemdict.setdefault('job_benefits', None),
                               itemdict.setdefault('job_desc_loc', None),
-                              itemdict.setdefault('job_desc_type', None),
-                              itemdict.setdefault('job_desc_detail', None),
+                              itemdict.setdefault('job_desc', None),
                               itemdict.setdefault('job_desc_resp', None),
                               itemdict.setdefault('job_desc_req', None),
                               itemdict.setdefault('job_reqSex', None),
                               itemdict.setdefault('job_reqAge', None),
-                              itemdict.setdefault('job_condition', None),)
+                              itemdict.setdefault('Job_reqLan', None),)
                        )
             log.msg("Item stored in db: %s" % item['url'], level=log.DEBUG)
     

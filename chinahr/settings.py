@@ -64,7 +64,6 @@ NEWSPIDER_MODULE = 'chinahr.spiders'
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
 #    'chinahr.pipelines.JsonWriterPipeline': 400,
-#    'chinahr.pipelines.TxtWriterPipeline': 400,
     'chinahr.pipelines.FormatItemPipeline': 100,
     'chinahr.pipelines.MySQLPipeline': 200,
     }
