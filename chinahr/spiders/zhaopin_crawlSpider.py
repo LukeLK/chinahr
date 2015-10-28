@@ -5,10 +5,10 @@ __author__ = 'bitfeng'
 
 import os
 import scrapy
-from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
 from chinahr.items import JobInfoItem, ComInfoItem
 from scrapy.loader import ItemLoader
 from chinahr.processors import *
+import logging
 
 
 # 参见liepin_crawlSpider
@@ -26,13 +26,15 @@ class ZhaopinCrawlSpider(scrapy.Spider):
 
     def parse(self, response):
         urls = response.xpath('//div[@class="newlist_list_content"]').re(u'(?<=href=")http://jobs.zhaopin.com/.*?(?=")')
-        for url in urls:
-            yield scrapy.Request(url, callback=self.parse_info)
-        reg_url = ''.join(response.xpath('//div[@class="pagesDown"]').
-                          re(u'(?<=<a href="#" class="current">)\d{1,3}</a>.*?(?=</a>)'))
-        next_url = ''.join(re.compile(u'(?<=href=")http.*?(?=")').findall(reg_url))
-        if next_url:
-            yield scrapy.Request(next_url, callback=self.parse)
+        if urls:
+            logging.warning('LEGAL_STARTURL:'+response.url)
+            for url in urls:
+                yield scrapy.Request(url, callback=self.parse_info)
+            reg_url = ''.join(response.xpath('//div[@class="pagesDown"]').
+                              re(u'(?<=<a href="#" class="current">)\d{1,3}</a>.*?(?=</a>)'))
+            next_url = ''.join(re.compile(u'(?<=href=")http.*?(?=")').findall(reg_url))
+            if next_url:
+                yield scrapy.Request(next_url, callback=self.parse)
 
     def parse_info(self, response):
 

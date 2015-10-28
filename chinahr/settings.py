@@ -15,7 +15,6 @@ SPIDER_MODULES = ['chinahr.spiders']
 NEWSPIDER_MODULE = 'chinahr.spiders'
 
 
-
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'chinahr (+http://www.yourdomain.com)'
 
@@ -98,5 +97,3 @@ MYSQL_URI = {
     'passwd': 'wybigdata',
     'charset': 'utf8',
     }
-
-

@@ -12,6 +12,7 @@ import datetime
 from twisted.enterprise import adbapi
 import MySQLdb
 import MySQLdb.cursors
+import logging
 from scrapy import log
 
 
@@ -123,7 +124,7 @@ class MySQLPipeline(object):
         tx.execute("select * from job where url = %s", (item['url'],))
         result = tx.fetchone()
         if result:
-            log.msg("Item already stored in db: %s" % item['url'], level=log.DEBUG)
+            logging.log(logging.DEBUG, "Item already stored in db: %s" % item['url'])
         else:
             itemdict = dict(item)
             sqli = "insert into job(insert_time," \
@@ -171,7 +172,7 @@ class MySQLPipeline(object):
                               itemdict.setdefault('job_reqAge', None),
                               itemdict.setdefault('Job_reqLan', None),)
                        )
-            log.msg("Item stored in db: %s" % item['url'], level=log.DEBUG)
+            logging.log(logging.DEBUG, "Item stored in db: %s" % item['url'])
     
     def _com_insert(self, tx, item):
         # create record if doesn't exist.
@@ -179,7 +180,7 @@ class MySQLPipeline(object):
         tx.execute("select * from company where url = %s", (item['url'],))
         result = tx.fetchone()
         if result:
-            log.msg("Item already stored in db: %s" % item['url'], level=log.DEBUG)
+            logging.log(logging.DEBUG, "Item already stored in db: %s" % item['url'])
         else:
             itemdict = dict(item)
             sqli = "insert into company(insert_time," \
@@ -213,7 +214,7 @@ class MySQLPipeline(object):
                               itemdict.setdefault('com_link', None),
                               itemdict.setdefault('com_zipCode', None),)
                        )
-            log.msg("Item stored in db: %s" % item['url'], level=log.DEBUG)
+            logging.log(logging.DEBUG, "Item stored in db: %s" % item['url'])
 
     def handle_error(self, e):
         log.err(e)

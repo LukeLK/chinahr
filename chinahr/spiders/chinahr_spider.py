@@ -9,6 +9,7 @@ import scrapy
 from chinahr.items import JobInfoItem, ComInfoItem
 from scrapy.loader import ItemLoader
 from chinahr.processors import *
+import logging
 
 # 参见liepin_crawlSpider
 class ChinahrSpider(scrapy.Spider):
@@ -27,6 +28,7 @@ class ChinahrSpider(scrapy.Spider):
         maxPageNumStr = ''.join(response.xpath('//a[@class="paging_jz"][last()]/span/text()').extract())
         onePage = ''.join(response.xpath('//a[@class="paging_jzd"]/span/text()').extract()).strip()
         if maxPageNumStr.isdigit():
+            logging.warning('LEGAL_STARTURL:'+response.url)
             url_sec = response.url.split('/')
             url_head = '/'.join(url_sec[0:-1])
             urls_tail = [str(i*20) for i in range(int(maxPageNumStr))]
@@ -42,6 +44,7 @@ class ChinahrSpider(scrapy.Spider):
         job_urls = response.xpath('//a[@class="js_detail"]/@href').extract()
         com_urls = response.xpath('//a[@class="js_com_name"]/@href').extract()
         category = ''.join(response.xpath('//div[@class="crumb_jobs"]/span[last()]/text()').extract()).strip()
+
         for url in job_urls:
             yield scrapy.Request(url, callback=self.parse_jobinfo, meta={'category': category})
         for url in com_urls:
@@ -66,7 +69,7 @@ class ChinahrSpider(scrapy.Spider):
         loader.add_xpath('job_nature', '//div[@class="job_desc"]/p/text()', TakeFirstL(), re=u'(?<=工作性质：)[\s\S]*')
         loader.add_xpath('job_desc_resp', '//p[@class="detial_jobSec"]', RemoveTagsL(), TakeFirstL(), re=u'(?<=岗位职责[:，：])[\s\S]*')        
         loader.add_xpath('job_desc_req', '//p[@class="detial_jobSec"]', RemoveTagsL(), TakeFirstL(), re=u'(?<=任职条件[:，：])[\s\S]*')        
-        loader.add_xpath('job_desc_detail', '//p[@class="detial_jobSec"]', RemoveTagsL(), TakeFirstL(), re=u'(?<=其他福利[:，：])[\s\S]*')
+        loader.add_xpath('job_desc', '//p[@class="detial_jobSec"]', RemoveTagsL(), TakeFirstL(), re=u'(?<=其他福利[:，：])[\s\S]*')
 
         return loader.load_item()
 
